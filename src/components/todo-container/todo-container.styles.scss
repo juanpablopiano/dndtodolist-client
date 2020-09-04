@@ -1,0 +1,58 @@
+.main-container {
+	border: 4px solid black;
+	border-radius: 10px;
+	height: 570px;
+	margin: 0 20px;
+	display: flex;
+	flex-direction: column;
+
+	.container-header {
+		height: 60px;
+		margin: 5px;
+		margin-bottom: 0;
+		border-bottom: 4px solid black;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0 10px;
+		width: 300px;
+
+		h1 {
+			font-size: 30px;
+		}
+
+		@mixin button-style {
+			cursor: pointer;
+			user-select: none;
+			width: 30px;
+			height: 30px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: white;
+			font-weight: 800;
+			border-radius: 4px;
+			margin: 2px;
+		}
+
+		.buttons {
+			display: flex;
+			.add {
+				background-color: rgb(47, 83, 182);
+
+				font-size: 20px;
+				@include button-style();
+			}
+
+			.delete {
+				background-color: rgb(209, 62, 62);
+				font-size: 15px;
+				@include button-style();
+			}
+		}
+	}
+
+	.todo-container {
+		overflow-y: auto;
+	}
+}
