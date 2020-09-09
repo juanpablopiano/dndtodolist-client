@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import socketIOClient from "socket.io-client";
+import { socket } from "../../App";
 
 import "./todo-container.styles.scss";
 
@@ -8,7 +8,6 @@ import "./todo-container.styles.scss";
 import Todo from "../todo/todo.component";
 import NewTodoForm from "../new-todo-form/new-todo-form.component";
 
-let socket;
 class TodoContainer extends React.Component {
 	constructor() {
 		super();
@@ -16,7 +15,6 @@ class TodoContainer extends React.Component {
 			todos: [],
 			creatingNew: false,
 		};
-		socket = socketIOClient(process.env.REACT_APP_API_URL);
 	}
 
 	async componentDidMount() {
@@ -32,6 +30,23 @@ class TodoContainer extends React.Component {
 			this.setState({ todos: todos });
 		});
 	}
+
+	handleDelete = async (id) => {
+		const deletedTodoId = await axios.delete(
+			`${process.env.REACT_APP_API_URL}/api/todo/${id}`
+		);
+		const updatedTodos = [...this.state.todos].filter(
+			(todo) => todo._id !== deletedTodoId.data
+		);
+
+		await axios.put(
+			`${process.env.REACT_APP_API_URL}/api/container/${this.props.id}`,
+			{ todos: updatedTodos }
+		);
+
+		this.setState({ todos: updatedTodos });
+	};
+
 	render() {
 		return (
 			<div className="main-container">
@@ -40,7 +55,7 @@ class TodoContainer extends React.Component {
 					<div className="buttons">
 						<div
 							className="add"
-							onClick={() => this.setState({ creatingNew: true })}
+							onClick={() => this.setState({ creatingNew: !this.state.creatingNew })}
 						>
 							+
 						</div>
@@ -70,6 +85,7 @@ class TodoContainer extends React.Component {
 							key={todo._id}
 							id={todo._id}
 							description={todo.description}
+							handleDelete={this.handleDelete}
 						/>
 					))}
 				</div>

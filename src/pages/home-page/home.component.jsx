@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import socketIOClient from "socket.io-client";
+import { socket } from "../../App";
 
 // Components
 import Board from "../../components/board/board.component";
@@ -10,8 +10,6 @@ import NewBoardForm from "../../components/new-board-form/new-board-form-compone
 // Styles
 import "./home.styles.scss";
 
-let socket;
-
 class Home extends React.Component {
 	constructor() {
 		super();
@@ -19,7 +17,6 @@ class Home extends React.Component {
 			welcome: "Welcome Juan",
 			data: [],
 		};
-		socket = socketIOClient(process.env.REACT_APP_API_URL);
 	}
 
 	async componentDidMount() {
@@ -28,7 +25,7 @@ class Home extends React.Component {
 		);
 		this.setState({ data: data });
 
-		socket.on("new board", data => {
+		socket.on("new board", (data) => {
 			const boards = [...this.state.data];
 			boards.push(data);
 			this.setState({ data: boards });
@@ -45,13 +42,10 @@ class Home extends React.Component {
 			<div>
 				<div className="header">
 					<h1>Welcome Juan</h1>
-					<button onClick={() => this.setState({ modal: true })}>
-						+ Create new Board
-					</button>
 				</div>
 				<NewBoardForm />
 				<BoardContainer>
-					{this.state.data.map(d => (
+					{this.state.data.map((d) => (
 						<Board
 							key={d._id}
 							title={d.name}

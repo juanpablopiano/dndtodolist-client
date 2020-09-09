@@ -6,7 +6,22 @@
 	cursor: grab;
     user-select: none;
     padding: 5px;
-    box-sizing: border-box;
+	box-sizing: border-box;
+	display: flex;
+	justify-content: space-between;
+
+	.buttons {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		button {
+			background-color: rgb(177, 47, 47);
+			border: none;
+			border-radius: 3px;
+			color: white;
+		}
+	}
 
 	&:active {
 		cursor: grabbing;

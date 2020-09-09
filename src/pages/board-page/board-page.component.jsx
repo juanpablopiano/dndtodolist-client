@@ -1,7 +1,8 @@
 import React from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import socketIOClient from "socket.io-client";
+// import socketIOClient from "socket.io-client";
+import {socket} from "../../App"
 
 // styles
 import "./board-page.styles.scss";
@@ -11,8 +12,6 @@ import ContainerContainer from "../../components/cont-container/cont-container.c
 import TodoContainer from "../../components/todo-container/todo-container.component";
 import NewContainerForm from "../../components/new-container-form/new-container-form-component";
 
-let socket;
-
 class BoardPage extends React.Component {
 	constructor() {
 		super();
@@ -21,7 +20,6 @@ class BoardPage extends React.Component {
 			board: {},
 			containers: [],
 		};
-		socket = socketIOClient(process.env.REACT_APP_API_URL);
 	}
 	async componentDidMount() {
 		this.setState({ fetching: true });
