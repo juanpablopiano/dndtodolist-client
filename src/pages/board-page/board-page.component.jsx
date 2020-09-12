@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 // import socketIOClient from "socket.io-client";
-import {socket} from "../../App"
+import { socket } from "../../App";
 
 // styles
 import "./board-page.styles.scss";
@@ -28,6 +28,9 @@ class BoardPage extends React.Component {
 		const { data } = await axios.get(
 			`${process.env.REACT_APP_API_URL}/api/board/get/${id}`
 		);
+		if (!data) {
+			this.setState({ board: false, fetching: false });
+		}
 		this.setState({ board: data, fetching: false });
 
 		const containersData = await axios.get(
@@ -35,22 +38,22 @@ class BoardPage extends React.Component {
 		);
 		this.setState({ containers: containersData.data });
 
-		socket.on("new container", data => {
+		socket.on("new container", (data) => {
 			const containers = [...this.state.containers];
 			containers.push(data);
 			this.setState({ containers: containers });
 		});
 	}
 
-	handleDelete = async id => {
+	handleDelete = async (id) => {
 		const deletedContainerId = await axios.delete(
 			`${process.env.REACT_APP_API_URL}/api/container/${id}`
 		);
 
 		const updatedContainers = [...this.state.containers].filter(
-			c => c._id !== deletedContainerId.data
+			(c) => c._id !== deletedContainerId.data
 		);
-			
+
 		await axios.put(
 			`${process.env.REACT_APP_API_URL}/api/board/${this.props.match.params.id}`,
 			{ containers: updatedContainers }
@@ -63,23 +66,30 @@ class BoardPage extends React.Component {
 		return (
 			<div>
 				<Link to="/">Go back</Link>
-				<div className="board-header">
-					<h1>{this.state.board.name}</h1>
-					<NewContainerForm
-						position={this.state.containers.length}
-						board={this.props.match.params.id}
-					/>
-				</div>
-				<ContainerContainer>
-					{this.state.containers.map(c => (
-						<TodoContainer
-							key={c._id}
-							title={c.name}
-							handleDelete={this.handleDelete}
-							id={c._id}
-						/>
-					))}
-				</ContainerContainer>
+				{this.state.board ? (
+					<div>
+						<div className="board-header">
+							<h1>{this.state.board.name}</h1>
+							<NewContainerForm
+								position={this.state.containers.length}
+								board={this.props.match.params.id}
+							/>
+						</div>
+						<ContainerContainer>
+							{this.state.containers.map((c) => (
+								<TodoContainer
+									board={this.props.match.params.id}
+									key={c._id}
+									title={c.name}
+									handleDelete={this.handleDelete}
+									id={c._id}
+								/>
+							))}
+						</ContainerContainer>
+					</div>
+				) : (
+					<h1>This board doesn't exist</h1>
+				)}
 			</div>
 		);
 	}

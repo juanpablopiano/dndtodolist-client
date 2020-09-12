@@ -73,6 +73,7 @@ class TodoContainer extends React.Component {
 					<div>
 						<NewTodoForm
 							container={this.props.id}
+							board={this.props.board}
 							hideForm={() =>
 								this.setState({ creatingNew: false })
 							}

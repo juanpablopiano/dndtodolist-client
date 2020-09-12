@@ -20,9 +20,7 @@ class Home extends React.Component {
 	}
 
 	async componentDidMount() {
-		const { data } = await axios.get(
-			`${process.env.REACT_APP_API_URL}/api/board/all`
-		);
+		const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/board/all`);
 		this.setState({ data: data });
 
 		socket.on("new board", (data) => {
@@ -30,11 +28,20 @@ class Home extends React.Component {
 			boards.push(data);
 			this.setState({ data: boards });
 		});
+
+		socket.on("deleted board", (data) => {
+			const boards = [...this.state.data];
+			this.setState({ data: boards.filter((b) => b._id === data) });
+		});
 	}
 
 	handleModal() {
 		console.log("turning off modal");
 		this.setState({ modal: false });
+	}
+
+	async handleDelete() {
+		await axios.delete(`${process.env.REACT_APP_API_URL}/api/board/${this.id}`);
 	}
 
 	render() {
@@ -46,12 +53,7 @@ class Home extends React.Component {
 				<NewBoardForm />
 				<BoardContainer>
 					{this.state.data.map((d) => (
-						<Board
-							key={d._id}
-							title={d.name}
-							author={d.author}
-							id={d._id}
-						></Board>
+						<Board key={d._id} title={d.name} author={d.author} id={d._id} handleDelete={this.handleDelete}></Board>
 					))}
 				</BoardContainer>
 			</div>

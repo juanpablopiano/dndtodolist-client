@@ -12,13 +12,14 @@ const NewTodoForm = (props) => {
 
 		const data = {
 			description,
-            container: props.container,
-            author: "Juan pablo"
-        };
+			container: props.container,
+			author: "Juan pablo",
+			board: props.board,
+		};
 		await axios.post(`${process.env.REACT_APP_API_URL}/api/todo/new`, data);
 
-        setDescription("");
-        props.hideForm();
+		setDescription("");
+		props.hideForm();
 	};
 
 	return (
