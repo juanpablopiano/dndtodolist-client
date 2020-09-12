@@ -18,9 +18,7 @@ class TodoContainer extends React.Component {
 	}
 
 	async componentDidMount() {
-		const { data } = await axios.get(
-			`${process.env.REACT_APP_API_URL}/api/todo/all/${this.props.id}`
-		);
+		const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/todo/all/${this.props.id}`);
 		this.setState({ todos: data });
 
 		socket.on("new todo", (data) => {
@@ -32,19 +30,16 @@ class TodoContainer extends React.Component {
 	}
 
 	handleDelete = async (id) => {
-		const deletedTodoId = await axios.delete(
-			`${process.env.REACT_APP_API_URL}/api/todo/${id}`
-		);
-		const updatedTodos = [...this.state.todos].filter(
-			(todo) => todo._id !== deletedTodoId.data
-		);
+		const deletedTodoId = await axios.delete(`${process.env.REACT_APP_API_URL}/api/todo/${id}`);
+		const updatedTodos = [...this.state.todos].filter((todo) => todo._id !== deletedTodoId.data);
 
-		await axios.put(
-			`${process.env.REACT_APP_API_URL}/api/container/${this.props.id}`,
-			{ todos: updatedTodos }
-		);
+		await axios.put(`${process.env.REACT_APP_API_URL}/api/container/${this.props.id}`, { todos: updatedTodos });
 
 		this.setState({ todos: updatedTodos });
+	};
+
+	handleDragOVer = (e) => {
+		console.log(e);
 	};
 
 	render() {
@@ -53,18 +48,10 @@ class TodoContainer extends React.Component {
 				<div className="container-header">
 					<h1>{this.props.title}</h1>
 					<div className="buttons">
-						<div
-							className="add"
-							onClick={() => this.setState({ creatingNew: !this.state.creatingNew })}
-						>
+						<div className="add" onClick={() => this.setState({ creatingNew: !this.state.creatingNew })}>
 							+
 						</div>
-						<div
-							className="delete"
-							onClick={() =>
-								this.props.handleDelete(this.props.id)
-							}
-						>
+						<div className="delete" onClick={() => this.props.handleDelete(this.props.id)}>
 							✖
 						</div>
 					</div>
@@ -74,20 +61,13 @@ class TodoContainer extends React.Component {
 						<NewTodoForm
 							container={this.props.id}
 							board={this.props.board}
-							hideForm={() =>
-								this.setState({ creatingNew: false })
-							}
+							hideForm={() => this.setState({ creatingNew: false })}
 						/>
 					</div>
 				) : null}
 				<div className="todo-container">
 					{this.state.todos.map((todo) => (
-						<Todo
-							key={todo._id}
-							id={todo._id}
-							description={todo.description}
-							handleDelete={this.handleDelete}
-						/>
+						<Todo key={todo._id} id={todo._id} description={todo.description} handleDelete={this.handleDelete} />
 					))}
 				</div>
 			</div>

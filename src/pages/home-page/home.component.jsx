@@ -30,8 +30,8 @@ class Home extends React.Component {
 		});
 
 		socket.on("deleted board", (data) => {
-			const boards = [...this.state.data];
-			this.setState({ data: boards.filter((b) => b._id === data) });
+			const boards = [...this.state.data].filter((b) => b._id !== data);
+			this.setState({ data: boards });
 		});
 	}
 
