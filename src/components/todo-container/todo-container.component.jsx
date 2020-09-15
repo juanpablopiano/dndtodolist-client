@@ -38,8 +38,9 @@ class TodoContainer extends React.Component {
 		this.setState({ todos: updatedTodos });
 	};
 
-	handleDragOVer = (e) => {
-		console.log(e);
+	handleDragOver = (e) => {
+		// const draggable = document.querySelector(".dragging")
+		// e.target.appendChild(draggable)
 	};
 
 	render() {
@@ -65,7 +66,7 @@ class TodoContainer extends React.Component {
 						/>
 					</div>
 				) : null}
-				<div className="todo-container">
+				<div className="todo-container" onDragOver={this.handleDragOver}>
 					{this.state.todos.map((todo) => (
 						<Todo key={todo._id} id={todo._id} description={todo.description} handleDelete={this.handleDelete} />
 					))}

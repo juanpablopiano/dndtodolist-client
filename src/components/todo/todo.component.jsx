@@ -10,7 +10,7 @@ const handleDragEnd = e => {
 }
 
 const Todo = (props) => (
-	<div className="todo" draggable onDrag={handleDrag} onDragEnd={handleDragEnd}>
+	<div className="todo" draggable onDragStart={handleDrag} onDragEnd={handleDragEnd}>
 		<div>{props.description}</div>
 		<div className="buttons">
 			<button onClick={() => props.handleDelete(props.id)}>✖</button>

@@ -1,5 +1,6 @@
 import React from "react";
 import socketIOClient from "socket.io-client";
+import "./App.css";
 
 // Pages
 import { Home } from "./pages/home-page/home.component";

@@ -23,7 +23,7 @@ const NewTodoForm = (props) => {
 	};
 
 	return (
-		<form>
+		<form className="todo-form">
 			<label htmlFor="description">New todo:</label>
 			<input
 				type="text"
