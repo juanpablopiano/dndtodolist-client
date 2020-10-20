@@ -57,7 +57,10 @@ class TodoContainer extends React.Component {
 						</div>
 					</div>
 				</div>
-				{this.state.creatingNew ? (
+				<div className="todo-container" onDragOver={this.handleDragOver}>
+					{this.state.todos.map((todo) => (
+						<Todo key={todo._id} id={todo._id} description={todo.description} handleDelete={this.handleDelete} />
+					))}
 					<div>
 						<NewTodoForm
 							container={this.props.id}
@@ -65,12 +68,8 @@ class TodoContainer extends React.Component {
 							hideForm={() => this.setState({ creatingNew: false })}
 						/>
 					</div>
-				) : null}
-				<div className="todo-container" onDragOver={this.handleDragOver}>
-					{this.state.todos.map((todo) => (
-						<Todo key={todo._id} id={todo._id} description={todo.description} handleDelete={this.handleDelete} />
-					))}
 				</div>
+				
 			</div>
 		);
 	}

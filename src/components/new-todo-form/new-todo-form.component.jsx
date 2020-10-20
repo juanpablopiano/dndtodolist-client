@@ -30,6 +30,7 @@ const NewTodoForm = (props) => {
 				name="description"
 				value={description}
 				onChange={(event) => setDescription(event.target.value)}
+				pattern={/[^ñ]*/}
 			/>
 			<input type="submit" value="Create todo" onClick={handleSubmit} />
 		</form>

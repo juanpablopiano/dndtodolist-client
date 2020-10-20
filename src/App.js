@@ -14,10 +14,15 @@ class App extends React.Component {
 	constructor() {
 		super();
 		socket = socketIOClient(process.env.REACT_APP_API_URL);
+
+		this.state = {
+			darkMode: false,
+		};
 	}
 	render() {
 		return (
-			<div className="App">
+			<div className={`App ${this.state.darkMode ? "darkmode" : ""}`}>
+				<button onClick={() => this.setState({ darkMode: !this.state.darkMode })}>Toggle dark mode</button>
 				<Switch>
 					<Route exact path="/" component={Home} />
 					<Route path="/board/:id" component={BoardPage} />
