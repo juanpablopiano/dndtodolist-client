@@ -27,15 +27,16 @@ class TodoContainer extends React.Component {
 			todos.push(data);
 			this.setState({ todos: todos });
 		});
+
+		socket.on("deleted todo", async (data) => {
+			const updatedTodos = [...this.state.todos].filter((todo) => todo._id !== data);
+			await axios.put(`${process.env.REACT_APP_API_URL}/api/container/${this.props.id}`, { todos: updatedTodos });
+			this.setState({ todos: updatedTodos });
+		});
 	}
 
 	handleDelete = async (id) => {
-		const deletedTodoId = await axios.delete(`${process.env.REACT_APP_API_URL}/api/todo/${id}`);
-		const updatedTodos = [...this.state.todos].filter((todo) => todo._id !== deletedTodoId.data);
-
-		await axios.put(`${process.env.REACT_APP_API_URL}/api/container/${this.props.id}`, { todos: updatedTodos });
-
-		this.setState({ todos: updatedTodos });
+		await axios.delete(`${process.env.REACT_APP_API_URL}/api/todo/${id}`);
 	};
 
 	handleDragOver = (e) => {

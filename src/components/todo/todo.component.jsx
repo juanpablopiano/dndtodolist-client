@@ -3,10 +3,10 @@ import React from "react";
 import "./todo.styles.scss";
 
 const handleDrag = e => {
-	e.target.classList.add("dragging")
+	console.log(e);
 }
 const handleDragEnd = e => {
-	e.target.classList.remove("dragging")
+	console.log(e);
 }
 
 const Todo = (props) => (
