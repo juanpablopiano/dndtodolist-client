@@ -39,38 +39,50 @@ class TodoContainer extends React.Component {
 		await axios.delete(`${process.env.REACT_APP_API_URL}/api/todo/${id}`);
 	};
 
-	handleDragOver = (e) => {
-		// const draggable = document.querySelector(".dragging")
-		// e.target.appendChild(draggable)
+	drop = (e) => {
+		e.preventDefault();
+		const todoId = e.dataTransfer.getData("todoId");
+
+		const todo = document.getElementById(todoId);
+		todo.style.display = "flex";
+
+		e.target.appendChild(todo);
+	};
+
+	dragOver = (e) => {
+		e.preventDefault();
 	};
 
 	render() {
 		return (
 			<div className="main-container">
-				<div className="container-header">
+				<div className="container-header" draggable>
 					<h1>{this.props.title}</h1>
 					<div className="buttons">
 						<div className="add" onClick={() => this.setState({ creatingNew: !this.state.creatingNew })}>
-							+
+							<span role="img" aria-label="plus-sign">
+								➕
+							</span>
 						</div>
 						<div className="delete" onClick={() => this.props.handleDelete(this.props.id)}>
-							✖
+							<span role="img" aria-label="x-sign">
+								✖
+							</span>
 						</div>
 					</div>
 				</div>
-				<div className="todo-container" onDragOver={this.handleDragOver}>
+				<div className="todo-container" onDrop={this.drop} onDragOver={this.dragOver}>
 					{this.state.todos.map((todo) => (
 						<Todo key={todo._id} id={todo._id} description={todo.description} handleDelete={this.handleDelete} />
 					))}
-					<div>
-						<NewTodoForm
-							container={this.props.id}
-							board={this.props.board}
-							hideForm={() => this.setState({ creatingNew: false })}
-						/>
-					</div>
 				</div>
-				
+				<div>
+					<NewTodoForm
+						container={this.props.id}
+						board={this.props.board}
+						hideForm={() => this.setState({ creatingNew: false })}
+					/>
+				</div>
 			</div>
 		);
 	}
