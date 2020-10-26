@@ -25,27 +25,33 @@ class BoardPage extends React.Component {
 		this.setState({ fetching: true });
 		const { id } = this.props.match.params;
 
+		// Bring the data of the board
 		const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/board/get/${id}`);
 		if (!data) {
 			this.setState({ board: false, fetching: false });
 		}
 		this.setState({ board: data, fetching: false });
 
+		// Bring the data of the containers pertaining the board
 		const containersData = await axios.get(`${process.env.REACT_APP_API_URL}/api/container/all/full/${id}`);
 
+		// bring the data of the todos pertaining this board too
 		const todos = await axios.get(`${process.env.REACT_APP_API_URL}/api/todo/all/board/${this.props.match.params.id}`);
 
+		// arrange the data of the todos inside the containers state
 		containersData.data.forEach(c => {
 			c.todos = todos.data.filter(t => t.container === c._id);
 		});
 		this.setState({ containers: containersData.data });
 
+		// Socket for when a new container is introduced
 		socket.on("new container", data => {
 			const containers = [...this.state.containers];
 			containers.push(data);
 			this.setState({ containers: containers });
 		});
 
+		// Socket for when a container is deleted
 		socket.on("deleted container", async data => {
 			const updatedContainers = [...this.state.containers].filter(c => c._id !== data);
 			await axios.put(`${process.env.REACT_APP_API_URL}/api/board/${this.props.match.params.id}`, {
@@ -54,12 +60,38 @@ class BoardPage extends React.Component {
 
 			this.setState({ containers: updatedContainers });
 		});
+
+		// Socket for when a todo is created
+		socket.on("new todo", data => {
+			const containersCopy = [...this.state.containers].map(c => {
+				if (c._id !== data.container) return c;
+				c.todos.push(data);
+				return c;
+			});
+			this.setState({ containers: containersCopy });
+		});
+
+		// Socket for when a todo is deleted
+		socket.on("deleted todo", async data => {
+			const [container] = [...this.state.containers].filter(c => c._id === data.container);
+			const updatedTodos = container.todos.filter(t => t._id !== data._id);
+
+			await axios.put(`${process.env.REACT_APP_API_URL}/api/container/${data.container}`, { todos: updatedTodos });
+
+			const containersCopy = [...this.state.containers].map(c => {
+				if (c._id !== data.container) return c;
+				c.todos = updatedTodos;
+				return c;
+			});
+			this.setState({ containers: containersCopy });
+		});
 	}
 
 	handleDelete = async id => {
 		await axios.delete(`${process.env.REACT_APP_API_URL}/api/container/${id}`);
 	};
 
+	// Function for handling the drop event
 	onDragEnd = result => {
 		if (!result.destination) return;
 		const { source, destination } = result;
