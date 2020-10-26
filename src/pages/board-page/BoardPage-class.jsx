@@ -12,6 +12,27 @@ import ContainerContainer from "../../components/cont-container/cont-container.c
 import TodoContainer from "../../components/todo-container/todo-container.component";
 import NewContainerForm from "../../components/new-container-form/new-container-form-component";
 
+const onDragEnd = (result, containers, setContainers) => {
+	if (!result.destination) return;
+
+	const { source, destination } = result;
+	const [sourceContainer] = containers.filter(c => c._id === source.droppableId);
+	const sourceTodos = [...sourceContainer.todos];
+	const [removed] = sourceTodos.splice(source.index, 1);
+	sourceContainer.todos = sourceTodos;
+
+	if (source.droppableId !== destination.droppableId) {
+		const [destinationContainer] = containers.filter(c => c._id === destination.droppableId);
+		const destTodos = [...destinationContainer.todos];
+		destTodos.splice(destination.index, 0, removed);
+		destinationContainer.todos = destTodos;
+	} else {
+		sourceTodos.splice(destination.index, 0, removed);
+	}
+	const containersCopy = [...containers];
+	setContainers({ containers: containersCopy });
+};
+
 class BoardPage extends React.Component {
 	constructor() {
 		super();
@@ -31,13 +52,7 @@ class BoardPage extends React.Component {
 		}
 		this.setState({ board: data, fetching: false });
 
-		const containersData = await axios.get(`${process.env.REACT_APP_API_URL}/api/container/all/full/${id}`);
-
-		const todos = await axios.get(`${process.env.REACT_APP_API_URL}/api/todo/all/board/${this.props.match.params.id}`);
-
-		containersData.data.forEach(c => {
-			c.todos = todos.data.filter(t => t.container === c._id);
-		});
+		const containersData = await axios.get(`${process.env.REACT_APP_API_URL}/api/container/all/${id}`);
 		this.setState({ containers: containersData.data });
 
 		socket.on("new container", data => {
@@ -60,27 +75,6 @@ class BoardPage extends React.Component {
 		await axios.delete(`${process.env.REACT_APP_API_URL}/api/container/${id}`);
 	};
 
-	onDragEnd = result => {
-		if (!result.destination) return;
-		const { source, destination } = result;
-		const containersCopy1 = [...this.state.containers];
-		const [sourceContainer] = containersCopy1.filter(c => c._id === source.droppableId);
-		const sourceTodos = [...sourceContainer.todos];
-		const [removed] = sourceTodos.splice(source.index, 1);
-		sourceContainer.todos = sourceTodos;
-
-		if (source.droppableId !== destination.droppableId) {
-			const [destinationContainer] = containersCopy1.filter(c => c._id === destination.droppableId);
-			const destTodos = [...destinationContainer.todos];
-			destTodos.splice(destination.index, 0, removed);
-			destinationContainer.todos = destTodos;
-		} else {
-			sourceTodos.splice(destination.index, 0, removed);
-		}
-		const containersCopy = [...this.state.containers];
-		this.setState({ containers: containersCopy });
-	};
-
 	render() {
 		return (
 			<div>
@@ -92,7 +86,9 @@ class BoardPage extends React.Component {
 							<NewContainerForm position={this.state.containers.length} board={this.props.match.params.id} />
 						</div>
 						<ContainerContainer>
-							<DragDropContext onDragEnd={result => this.onDragEnd(result)}>
+							<DragDropContext
+								onDragEnd={result => onDragEnd(result, this.state.containers, this.setState.bind(this))}
+							>
 								{this.state.containers.map(c => (
 									<TodoContainer
 										board={this.props.match.params.id}
@@ -100,7 +96,6 @@ class BoardPage extends React.Component {
 										title={c.name}
 										handleDelete={this.handleDelete}
 										id={c._id}
-										todos={c.todos}
 									/>
 								))}
 							</DragDropContext>
