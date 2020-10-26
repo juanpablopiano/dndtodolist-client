@@ -3,10 +3,10 @@ import axios from "axios";
 
 import "./new-todo-form.styles.scss";
 
-const NewTodoForm = (props) => {
+const NewTodoForm = props => {
 	const [description, setDescription] = useState("");
 
-	const handleSubmit = async (e) => {
+	const handleSubmit = async e => {
 		e.preventDefault();
 		if (!description) return;
 
@@ -20,16 +20,18 @@ const NewTodoForm = (props) => {
 
 		setDescription("");
 		props.hideForm();
+		document.getElementById(`t-${props.container}`).focus();
 	};
 
 	return (
 		<form className="todo-form">
 			<label htmlFor="description">New todo:</label>
 			<input
+				id={`t-${props.container}`}
 				type="text"
 				name="description"
 				value={description}
-				onChange={(event) => setDescription(event.target.value)}
+				onChange={event => setDescription(event.target.value)}
 				pattern={/[^ñ]*/}
 			/>
 			<input type="submit" value="Create todo" onClick={handleSubmit} />
